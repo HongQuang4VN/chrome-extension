@@ -1,6 +1,7 @@
-﻿var ptt_dkhp = {
-	name: "username", // Thay đổi thành tài khoản chứng thực của bạn
-	pass: "password", // Password của tài khoản chứng thực
+console.log("%c ĐKHP UIT - Truoc Phan\n%chttps://www.facebook.com/TruocPT/", "color: green; font-style: italic; font-size: 42px", "font-size: 16px;");
+var ptt_dkhp = {
+	name: "15520949", // Thay đổi thành tài khoản chứng thực của bạn
+	pass: "truoc949", // Password của tài khoản chứng thực
 };
 
 /***
@@ -40,81 +41,80 @@ var ptt_malop = {
 	4: {
 		0: "NT532.J11.ANTN",
 		1: "NT532.J11.ANTN.1"
+	},
+	// Mã lớp SS001.J11
+	5: {
+		0: "SS001.J11"
 	}
 };
+var ptt_dk_thanhcong = {};
 
-setInterval(
+var ptt_callback = setInterval(
 	function(){
-		$(document).ready(
-			function(){
-				var i = 0;
-				while(i < Object.keys(ptt_malop).length){
-					$.ajaxSetup({async: false});
-					$.post(
-						"https://dkhp.uit.edu.vn/",
-						{"name": ptt_dkhp.name, "pass": ptt_dkhp.pass, "form_id": "user_login", "op": "Log in"}
+		for(var k in ptt_malop){
+			$.ajaxSetup({async: false});
+			$.post(
+				"https://dkhp.uit.edu.vn/",
+				{"name": ptt_dkhp.name, "pass": ptt_dkhp.pass, "form_id": "user_login", "op": "Log in"}
+			).done(
+				function(){	
+					$.get(
+						"https://dkhp.uit.edu.vn/sinhvien/hocphan/dangky"
 					).done(
-						function(){
-							$.ajaxSetup({async: false});
-							$.get(
-								"https://dkhp.uit.edu.vn/sinhvien/hocphan/dangky"
+						function(data){
+							var form_build_id = /name="form_build_id" value="(.*)"/.exec(data)[1];
+							var form_token = /name="form_token" value="(.*)"/.exec(data)[1];
+							var ptt_post_data = {};
+							for(var k1 in ptt_malop[k]){
+								console.warn("Đang cố gắng đăng ký mã lớp " + ptt_malop[k][k1]);
+								ptt_post_data["table_lophoc[" + ptt_malop[k][k1] + "]"] = ptt_malop[k][k1];
+							}
+							ptt_post_data["dsmalop"] = "";
+							ptt_post_data["loaimonhoc"] = "";
+							ptt_post_data["khoaql"] = "";
+							ptt_post_data["mamh"] = "";
+							ptt_post_data["op"] = "Đăng ký";
+							ptt_post_data["txtmasv"] = ptt_dkhp.name;
+							ptt_post_data["form_build_id"] = form_build_id
+							ptt_post_data["form_token"] = form_token;
+							ptt_post_data["form_id"] = "uit_dkhp_dangky_form";
+							$.post(
+								"https://dkhp.uit.edu.vn/sinhvien/hocphan/dangky",
+								ptt_post_data,
 							).done(
-								function(data){
-									var form_build_id = /name="form_build_id" value="(.*)"/.exec(data)[1];
-									var form_token = /name="form_token" value="(.*)"/.exec(data)[1];
-									var ptt_post_data = {};
-									for(var j = 0; j < Object.keys(ptt_malop[i]).length; j++){
-										ptt_post_data["table_lophoc[" + ptt_malop[i][j] + "]"] = ptt_malop[i][j];
-									}
-									ptt_post_data["dsmalop"] = "";
-									ptt_post_data["loaimonhoc"] = "";
-									ptt_post_data["khoaql"] = "";
-									ptt_post_data["mamh"] = "";
-									ptt_post_data["op"] = "Đăng ký";
-									ptt_post_data["txtmasv"] = ptt_dkhp.name;
-									ptt_post_data["form_build_id"] = form_build_id
-									ptt_post_data["form_token"] = form_token;
-									ptt_post_data["form_id"] = "uit_dkhp_dangky_form";
-									$.ajaxSetup({async: false});
-									$.post(
-										"https://dkhp.uit.edu.vn/sinhvien/hocphan/dangky",
-										ptt_post_data,
-										function(result){
-											for(var j in ptt_malop[i]){
-												var pattern = new RegExp("table_lophoc_dadk\\[" + ptt_malop[i][j].replace(".", "\\.") + "\\]");
-												if(pattern.test(result)){
-													chrome.notifications.create(
-														ptt_malop[i][j],
-														{
-															type: "basic",
-															iconUrl: "../images/icon.png",
-															title: "ĐKHP UIT",
-															message: "Mã lớp " + ptt_malop[i][j] + " đã đăng ký thành công!"
-														}
-													);
-													console.log("Mã lớp " + ptt_malop[i][j] + " đã đăng ký thành công!");
-													delete ptt_malop[i][j];
+								function(result){
+									for(var k1 in ptt_malop[k]){
+										var pattern = new RegExp("table_lophoc_dadk\\[" + ptt_malop[k][k1].replace(".", "\\.") + "\\]");
+										if(pattern.test(result)){
+											chrome.notifications.create(
+												ptt_malop[k][k1],
+												{
+													type: "basic",
+													iconUrl: "../images/icon.png",
+													title: "ĐKHP UIT",
+													message: "Mã lớp " + ptt_malop[k][k1] + " đã đăng ký thành công!"
 												}
-											}
-											for(var j in ptt_malop[i]){
-												console.log("Đang thử đăng ký lại mã lớp: " + ptt_malop[i][j]);
-											}
+											);
+											ptt_dk_thanhcong[k] = "";
+											console.log("%c[" + (((new Date().getHours()) <= 9) ? ("0"+(new Date().getHours())) : (new Date().getHours())) + ":" + (((new Date().getMinutes()) <= 9) ? ("0"+(new Date().getMinutes())) : (new Date().getMinutes())) + ":" + (((new Date().getSeconds()) <= 9) ? ("0"+(new Date().getSeconds())) : (new Date().getSeconds())) + "] Mã lớp " + ptt_malop[k][k1] + " đã đăng ký thành công!", "color: blue;");
+											delete ptt_malop[k][k1];
 										}
-									).done(
-										function(){
-											i++;
-										}
-									);
-									$.ajaxSetup({async: true});
+									}
 								}
 							);
-							$.ajaxSetup({async: true});
 						}
 					);
-					$.ajaxSetup({async: true});
 				}
-			}
-		);
+			);
+		}
+		for(var k in ptt_dk_thanhcong){
+			delete ptt_malop[k];
+		}
+		if(Object.keys(ptt_malop).length == 0)
+		{
+			console.log("%c[" + (((new Date().getHours()) <= 9) ? ("0"+(new Date().getHours())) : (new Date().getHours())) + ":" + (((new Date().getMinutes()) <= 9) ? ("0"+(new Date().getMinutes())) : (new Date().getMinutes())) + ":" + (((new Date().getSeconds()) <= 9) ? ("0"+(new Date().getSeconds())) : (new Date().getSeconds())) + "] Tất cả mã lớp đã đăng ký thành công!", "color: blue; font-size: 20px;");
+			clearInterval(ptt_callback);
+		}
 	},
 	2000
 );
