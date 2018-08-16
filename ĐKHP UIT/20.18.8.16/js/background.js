@@ -1,7 +1,7 @@
-console.log("%c ĐKHP UIT - Truoc Phan\n%chttps://www.facebook.com/TruocPT/", "color: green; font-style: italic; font-size: 42px", "font-size: 16px;");
+﻿console.log("%c ĐKHP UIT - Truoc Phan\n%chttps://www.facebook.com/TruocPT/", "color: green; font-style: italic; font-size: 42px", "font-size: 16px;");
 var ptt_dkhp = {
-	name: "15520949", // Thay đổi thành tài khoản chứng thực của bạn
-	pass: "truoc949", // Password của tài khoản chứng thực
+	name: "username", // Thay đổi thành tài khoản chứng thực của bạn
+	pass: "password", // Password của tài khoản chứng thực
 };
 
 /***
